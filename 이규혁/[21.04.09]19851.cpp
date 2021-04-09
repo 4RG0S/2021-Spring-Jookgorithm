@@ -37,12 +37,14 @@ node init(int now, int s, int e)
 			seg[now].l2 = seg[now].r = 1;
 		else
 			seg[now].l = seg[now].r2 = 1;
+		//printf("s=%d e=%d l=%d r=%d l2=%d r2=%d\n", s, e, seg[now].l, seg[now].r, seg[now].l2, seg[now].r2);
 		return seg[now];
 	}
 	left = init(now * 2, s, mid);
 	right = init(now * 2 + 1, mid + 1, e);
 
 	merge(now, left, right);
+	//printf("s=%d e=%d l=%d r=%d l2=%d r2=%d\n", s, e, seg[now].l, seg[now].r, seg[now].l2, seg[now].r2);
 	return seg[now];
 }
 node update(int now, int s, int e, int ql, int qr)
@@ -72,12 +74,14 @@ node update(int now, int s, int e, int ql, int qr)
 			lazy[now * 2] ^= 1;
 			lazy[now * 2 + 1] ^= 1;
 		}
+		//printf("s=%d e=%d l=%d r=%d l2=%d r2=%d\n", s, e, seg[now].l, seg[now].r, seg[now].l2, seg[now].r2);
 		return seg[now];
 	}
 	left = update(now * 2, s, mid, ql, qr);
 	right = update(now * 2 + 1, mid + 1, e, ql, qr);
 
 	merge(now, left, right);
+	//printf("s=%d e=%d l=%d r=%d l2=%d r2=%d\n", s, e, seg[now].l, seg[now].r, seg[now].l2, seg[now].r2);
 	return seg[now];
 }
 node query(int now, int s, int e, int ql, int qr)
@@ -94,6 +98,7 @@ node query(int now, int s, int e, int ql, int qr)
 		lazy[now * 2 + 1] ^= 1;
 		lazy[now] = 0;
 	}
+	//printf("s=%d e=%d l=%d r=%d l2=%d r2=%d\n", s, e, seg[now].l, seg[now].r, seg[now].l2, seg[now].r2);
 	if (ql > e || qr < s)
 		return retval;
 	if (ql <= s && qr >= e)
@@ -107,6 +112,28 @@ node query(int now, int s, int e, int ql, int qr)
 	retval.r2 = max(left.r2 - right.l2, 0) + right.r2;
 	return retval;
 }
+/*
+))))((  (())((
+left.l=4, left.r=2
+right.l=0 right.r=2
+
+now.l=0
+now.r=4
+
+)((() )(()(
+left.l=1, left.r=2
+right.l=1, right.r=2
+
+max(left.r-right.l,0)+right.r
+max(right.l-left.r,0)+left.l
+
+now.l=0,now.r=3
+
+)(() (())
+left.l=1, left.r=1
+
+
+*/
 
 int main()
 {
@@ -132,3 +159,8 @@ int main()
 		}
 	}
 }
+/*
+ ()((
+ )())
+ ))))
+*/
