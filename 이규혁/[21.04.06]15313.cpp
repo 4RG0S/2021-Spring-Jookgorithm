@@ -2,69 +2,165 @@
 #include <stdio.h>
 #include <algorithm>
 #include <memory.h>
+#include <vector>
+#include <string.h>
 #define ll long long int
+#define SIZE 111111
+#define MOD 5000000
 
 using namespace std;
 
-pair<pair<int, int>, pair<ll, ll>> info[2222];
-ll h[2222];
-int y[2222];
+struct node {
+	int l, r, l2, r2;
+};
+node seg[4444444];
+int lazy[4444444];
 
-ll seg[8080];
+char info[1111111];
+
+void merge(int now, node left, node right)
+{
+	seg[now].l = max(right.l - left.r, 0) + left.l;
+	seg[now].r = max(left.r - right.l, 0) + right.r;
+	seg[now].l2 = max(right.l2 - left.r2, 0) + left.l2;
+	seg[now].r2 = max(left.r2 - right.l2, 0) + right.r2;
+}
+
+node init(int now, int s, int e)
+{
+	int mid = (s + e) / 2;
+	node left, right;
+
+	if (s == e)
+	{
+		if (info[s] == '(')
+			seg[now].l2 = seg[now].r = 1;
+		else
+			seg[now].l = seg[now].r2 = 1;
+		//printf("s=%d e=%d l=%d r=%d l2=%d r2=%d\n", s, e, seg[now].l, seg[now].r, seg[now].l2, seg[now].r2);
+		return seg[now];
+	}
+	left = init(now * 2, s, mid);
+	right = init(now * 2 + 1, mid + 1, e);
+
+	merge(now, left, right);
+	//printf("s=%d e=%d l=%d r=%d l2=%d r2=%d\n", s, e, seg[now].l, seg[now].r, seg[now].l2, seg[now].r2);
+	return seg[now];
+}
+node update(int now, int s, int e, int ql, int qr)
+{
+	int mid = (s + e) / 2;
+	node left, right;
+
+	if (lazy[now])
+	{
+		swap(seg[now].l, seg[now].l2);
+		swap(seg[now].r, seg[now].r2);
+
+		lazy[now * 2] ^= 1;
+		lazy[now * 2 + 1] ^= 1;
+		lazy[now] = 0;
+	}
+
+	if (ql > e || qr < s)
+		return seg[now];
+	if (ql <= s && qr >= e)
+	{
+		swap(seg[now].l, seg[now].l2);
+		swap(seg[now].r, seg[now].r2);
+
+		if (s != e)
+		{
+			lazy[now * 2] ^= 1;
+			lazy[now * 2 + 1] ^= 1;
+		}
+		//printf("s=%d e=%d l=%d r=%d l2=%d r2=%d\n", s, e, seg[now].l, seg[now].r, seg[now].l2, seg[now].r2);
+		return seg[now];
+	}
+	left = update(now * 2, s, mid, ql, qr);
+	right = update(now * 2 + 1, mid + 1, e, ql, qr);
+
+	merge(now, left, right);
+	//printf("s=%d e=%d l=%d r=%d l2=%d r2=%d\n", s, e, seg[now].l, seg[now].r, seg[now].l2, seg[now].r2);
+	return seg[now];
+}
+node query(int now, int s, int e, int ql, int qr)
+{
+	int mid = (s + e) / 2;
+	node retval = { 0 }, left, right;
+
+	if (lazy[now])
+	{
+		swap(seg[now].l, seg[now].l2);
+		swap(seg[now].r, seg[now].r2);
+
+		lazy[now * 2] ^= 1;
+		lazy[now * 2 + 1] ^= 1;
+		lazy[now] = 0;
+	}
+	//printf("s=%d e=%d l=%d r=%d l2=%d r2=%d\n", s, e, seg[now].l, seg[now].r, seg[now].l2, seg[now].r2);
+	if (ql > e || qr < s)
+		return retval;
+	if (ql <= s && qr >= e)
+		return seg[now];
+
+	left = query(now * 2, s, mid, ql, qr);
+	right = query(now * 2 + 1, mid + 1, e, ql, qr);
+	retval.l = max(right.l - left.r, 0) + left.l;
+	retval.r = max(left.r - right.l, 0) + right.r;
+	retval.l2 = max(right.l2 - left.r2, 0) + left.l2;
+	retval.r2 = max(left.r2 - right.l2, 0) + right.r2;
+	return retval;
+}
+/*
+))))((  (())((
+left.l=4, left.r=2
+right.l=0 right.r=2
+
+now.l=0
+now.r=4
+
+)((() )(()(
+left.l=1, left.r=2
+right.l=1, right.r=2
+
+max(left.r-right.l,0)+right.r
+max(right.l-left.r,0)+left.l
+
+now.l=0,now.r=3
+
+)(() (())
+left.l=1, left.r=1
 
 
+*/
 
 int main()
 {
-	int n, i, j, idx1 = 1, idx2 = 1;
-	ll m, res = 1987654321;
+	int n, m, i, sz;
 
-	scanf("%d%lld", &n, &m);
+	scanf("%d", &n);
+	scanf("%s", info);
 
-	for (i = 1; i <= n; i++)
+	sz = strlen(info);
+	scanf("%d", &m);
+	init(1, 0, n - 1);
+	while (m--)
 	{
-		info[i].first.first = info[i].first.second = info[i].second.first = info[i].second.second = i;
-		scanf("%d%d%lld%lld", &info[i].first.first, &info[i].first.second, &info[i].second.first, &info[i].second.second);
-		h[i] = info[i].second.second;;
-		y[i] = info[i].first.second;
-	}
-	sort(info + 1, info + n + 1);
-	sort(h + 1, h + n + 1);
-	sort(y + 1, y + n + 1);
-
-	while (idx1 <= idx2)
-	{
-		fill(seg, seg + 8080, 0);
-		//printf("idx1=%d idx2=%d h[idx1]=%lld h[idx2]=%lld\n", idx1, idx2,h[idx1],h[idx2]);
-		for (i = 1; i <= n; i++)
-		{
-			ll t=-1;
-			int idx = lower_bound(y + 1, y + n + 1, info[i].first.second) - y;
-
-			//printf("i=%d h[i]=%lld\n", i, info[i].second.second);
-			if (info[i].second.second >= h[idx1] && info[i].second.second <= h[idx2])
-			{
-				t = query(1, 1, n, 1, idx)+info[i].second.first;
-				update(1, 1, n, idx, t);
-				if (t >= m)
-				{
-					res = minl(res, h[idx2] - h[idx1]);
-					break;
-				}
-			}
-		//	printf("i=%d t=%lld\n", i, t);
-
-
-		}
-		if (i <= n)
-			idx1++;
+		int a, b, c;
+		node res;
+		scanf("%d%d%d", &a, &b, &c);
+		if (a == 1)
+			update(1, 0, n - 1, b - 1, c - 1);
 		else
-			idx2++;
-		if (idx2 > n)
-			break;
+		{
+			res = query(1, 0, n - 1, b - 1, c - 1);
+			printf("%d\n", res.l + res.r + (c - b + 1));
+		}
 	}
-	if (res == 1987654321)
-		printf("-1");
-	else
-		printf("%lld", res);
 }
+/*
+ ()((
+ )())
+ ))))
+*/
