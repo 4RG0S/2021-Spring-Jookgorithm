@@ -4,7 +4,7 @@
 #include <algorithm>
 #define ll long long int
 #define SIZE 555555
-#define INF -10000000000000
+#define INF -10000000000001
 #define MOD 4294967296
 
 using namespace std;

@@ -5,7 +5,7 @@
 #define ll long long int
 #define SIZE 111111
 #define INF 1987654321
-#define MOD 4294967296
+#define MOD 4294967291
 
 using namespace std;
 

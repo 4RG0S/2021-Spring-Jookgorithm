@@ -10,7 +10,7 @@ pair<pair<int, int>, pair<ll, ll>> info[2222];
 ll h[2222];
 int y[2222];
 
-ll seg[8080];
+ll seg[8081];
 
 ll maxl(ll a, ll b)
 {
