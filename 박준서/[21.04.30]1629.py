@@ -4,7 +4,7 @@ def exp(a, b, c):
     else:
         n = exp(a, b//2, c)%c
         if b%2 == 0:
-            return n*n
+            return n*n%c
         else:
             return n*n*a%c
 
