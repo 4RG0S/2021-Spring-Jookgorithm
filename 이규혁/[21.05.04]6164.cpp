@@ -124,27 +124,5 @@ int main()
 			scanf("%d%d", &a, &b);
 			update(1, 1, n, a, min(n, a + b - 1), 0);
 		}
-		//char comm;
-		//int a, b;
-		//scanf(" %c", &comm);
-
-		//if (comm == 'A')
-		//{
-		//	scanf("%d", &a);
-		//	int idx;
-		//	idx = query(1, 1, n, a);
-		//	if (idx == -1)
-		//	{
-		//		res++;
-		//		continue;
-		//	}
-		//	//	printf("%d\n", idx);
-		//	update(1, 1, n, idx, idx + a - 1, 1);
-		//}
-		//else
-		//{
-		//	scanf("%d%d", &a, &b);
-		//	update(1, 1, n, a, b, 0);
-		//}
 	}
 }
